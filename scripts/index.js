@@ -1,11 +1,11 @@
-// setup materialize components
+  // setup materialize components
 document.addEventListener('DOMContentLoaded', function() {
     var modals = document.querySelectorAll('.modal');
     M.Modal.init(modals);
     var items = document.querySelectorAll('.collapsible');
     M.Collapsible.init(items);
   });
-  
+
 // set up pin list
 const pinList = document.querySelector('#pin-list');
 const form = document.querySelector('#add-pin-form');
@@ -38,6 +38,23 @@ function renderPin(doc){
 }
 
 
+
+const loggedOutLinks= document.querySelectorAll('.logged-out');
+const loggedInLinks = document.querySelectorAll('.logged-in');
+const contentView = document.querySelectorAll('.content');
+
+const setUpFrontEnd = (user) =>{
+    if (user){
+        loggedInLinks.forEach(item => item.style.display = 'block');
+        loggedOutLinks.forEach(item => item.style.display='none');
+        contentView.forEach(item => item.style.display='block');
+    }else{
+        loggedInLinks.forEach(item => item.style.display = 'none');
+        loggedOutLinks.forEach(item => item.style.display='block');
+        contentView.forEach(item => item.style.display='none');
+    }
+}
+/////////// end of log in stuff
 var mymap = L.map('mapid').setView([51.458179,-0.114981], 13);// init with lat lon zoom
 
 
@@ -48,3 +65,50 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
     accessToken: 'pk.eyJ1IjoidGVzdGFjYzEiLCJhIjoiY2s1Z3N6djl5MDkweDNubXBwbHc5bGhiNCJ9.TUdGQk7n0swbE-bnEOy26A'
 }).addTo(mymap);
 //(51.456146, -0.108147)
+
+var container = L.DomUtil.create('div');
+var popup = L.popup();
+var marker = L.marker();
+
+var getCords;
+
+function onMapClick(e) {
+    popup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString() + "\n  see below for more options...")
+        .openOn(mymap)
+        getCords = e.latlng;
+        document.getElementById("testBox").value = getCords;
+    marker
+        .setLatLng(e.latlng)
+        .bindPopup(document.getElementById('testBox').value).openPopup()
+        .addTo(mymap)
+}
+mymap.on('click', onMapClick);
+
+function pinsToMap(pinInfo) {  // IMPORTANT! => pinInfo is a DocumentSnapshot
+
+    const pinName = pinInfo.data().name
+    const pinCoOrds = pinInfo.data().coOrds
+    const pinToMapInfo = pinInfo.data().Info
+ 
+    //pinCoOrds is a JavaScript Array with two elements
+    ID21712721 = new L.marker([pinCoOrds[0],pinCoOrds[1]]).addTo(mymap).bindPopup('Pin Name: '+pinName+'<br>'+'Information : '+pinToMapInfo).openPopup()
+ }
+ db.collection('Pins').get().then(snapshot => {
+    snapshot.forEach(pinInfo => {
+         pinsToMap(pinInfo)
+    });
+});
+
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    db.collection('Pins').add({
+        name: form.name.value,
+        Info: form.Info.value,
+        coOrds: form.coOrds.value.replace("LatLng(", "").replace(")", "").split(',')
+    });
+    form.name.value = '';
+    form.Info.value = '';
+    form.coOrds.value = '';
+});
