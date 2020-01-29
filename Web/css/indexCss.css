@@ -1,6 +1,23 @@
   
 #mapid { height: 280px;}
 
+body {
+	background: linear-gradient(-45deg, #c81c4f, #e1225b, #5bead6, #6876a8,#b580c4);
+	background-size: 400% 400%;
+	animation: gradient 35s ease infinite;
+}
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
 
 h1{
     width: 100%;
