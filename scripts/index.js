@@ -1,3 +1,13 @@
+// setup materialize components
+document.addEventListener('DOMContentLoaded', function() {
+    var modals = document.querySelectorAll('.modal');
+    M.Modal.init(modals);
+    var items = document.querySelectorAll('.collapsible');
+    M.Collapsible.init(items);
+  });
+
+
+
 var mymap = L.map('mapid').setView([51.458179,-0.114981], 13);// init with lat lon zoom
 
 
