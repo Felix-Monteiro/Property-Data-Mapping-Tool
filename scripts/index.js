@@ -54,7 +54,7 @@ const setUpFrontEnd = (user) =>{
         contentView.forEach(item => item.style.display='none');
     }
 }
-/////////// end of log in stuff
+/////////// end of log in code
 var mymap = L.map('mapid').setView([51.458179,-0.114981], 13);// init with lat lon zoom
 
 
@@ -112,3 +112,46 @@ form.addEventListener('submit', (e) => {
     form.Info.value = '';
     form.coOrds.value = '';
 });
+//===== API CODE=====
+//Making a Popup with the info from the API
+function onEachFeature(feature, layer) {
+    if (feature.properties && feature.properties.OWNER) {
+    layer.bindPopup(feature.properties.OWNER+' <br> Park name: '+feature.properties.PARK_NAME+'<br> Park Postcode:'+feature.properties.POSTCODE+'<br> Park status: '+feature.properties.PARK_STATUS);
+     }
+    }
+    //Setting the API
+    const apiG_url='https://ee61dab8-6bcf-42be-a64e-cb86f4693e9f.mock.pstmn.io?GreenSpaces=7845';
+
+    //GreenSpaces 
+    async function getGreenSpaces(){
+        const response = await fetch(apiG_url);
+        const data= await response.json();
+        console.log(data);
+        //Use this code to put out all the polygons in Wycombe
+        L.geoJSON(data).addTo(mymap);
+        
+        L.geoJSON(data, {
+            onEachFeature: onEachFeature
+        }).addTo(mymap);
+
+
+    };
+
+    getGreenSpaces();
+
+    const api_url='https://ee61dab8-6bcf-42be-a64e-cb86f4693e9f.mock.pstmn.io?Buildings=545158';
+          
+            //This Will be the Buildings polygons 
+            async function getBrixton(){
+                const response = await fetch(api_url);
+                const data= await response.json();
+                console.log(data);
+                //Use this code to put out all the polygons in Brixton
+                var PropertyLayer = L.geoJSON().addTo(mymap);
+                PropertyLayer.addData(data);
+
+                L.geoJSON(data, {
+                 onEachFeature: onEachFeature
+                }).addTo(mymap);
+            };
+           getBrixton();
