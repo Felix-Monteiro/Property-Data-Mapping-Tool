@@ -69,8 +69,15 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 var container = L.DomUtil.create('div');
 var popup = L.popup();
 var marker = L.marker();
-
+L.control.scale().addTo(mymap);
 var getCords;
+
+var markersLayer = new L.LayerGroup();	//layer contain searched elements
+	
+	mymap.addLayer(markersLayer);
+
+
+
 
 function onMapClick(e) {
     popup
@@ -113,7 +120,7 @@ form.addEventListener('submit', (e) => {
     form.coOrds.value = '';
 });
 //===== API CODE=====
-//Making a Popup with the info from the API
+// //Making a Popup with the info from the API
 function onEachFeature(feature, layer) {
     if (feature.properties && feature.properties.OWNER) {
     layer.bindPopup(feature.properties.OWNER+' <br> Park name: '+feature.properties.PARK_NAME+'<br> Park Postcode:'+feature.properties.POSTCODE+'<br> Park status: '+feature.properties.PARK_STATUS);
@@ -155,3 +162,25 @@ function onEachFeature(feature, layer) {
                 }).addTo(mymap);
             };
            getBrixton();
+// var controlSearch = new L.Control.Search({
+//     position:'topright',		
+//     layer: markersLayer,
+//     initial: false,
+//     zoom: 12,
+//     marker: false
+// });
+
+// mymap.addControl( controlSearch );
+
+var searchControl = new L.esri.Controls.Geosearch().addTo(mymap);
+
+var results = new L.LayerGroup().addTo(mymap);
+
+searchControl.on('results', function (data) {
+    results.clearLayers();
+    for (var i = data.results.length - 1; i >= 0; i--) {
+        results.addLayer(L.marker(data.results[i].latlng));
+    }
+});
+
+mymap.addControl(searchControl);
